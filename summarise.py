@@ -1,10 +1,13 @@
 import nltk
 
 # OPEN ARTICLES
-file = open("article_one.txt")
-article = ""
+# file = open("article_one.txt")
 
 # file = open("article_two.txt")
+
+file = open("article_three.txt")
+
+article = ""
 
 # REMOVE PHARAGRAPH SPACES
 for line in file:
@@ -12,6 +15,9 @@ for line in file:
         article += line
 
 article_sen = nltk.sent_tokenize(article)
+
+# USED FOR GENERATION
+sorted_sen = article_sen[:] #COPY WITHOUT REFFERENCE
 
 # print(article_sen)
 
@@ -59,13 +65,41 @@ for word in article_word:
         unique_word.append(word)
         unique_frequency.append(1)
 
-print(unique_word)
-print(unique_frequency)
-print(highest_freq)
+# print(unique_word)
+# print(unique_frequency)
+# print(highest_freq)
 
 for frequency in unique_frequency:
     word_scores.append(frequency/highest_freq)
 
-print(word_scores)
+# print(word_scores)
+
+sen_scores = []
+
+for sen_index in range(0, len(article_sen)-1):
+    sen_scores.append(0)
+    for word in article_sen[sen_index]:
+        for word_index in range(0, len(unique_word)-1):
+            if word == unique_word[word_index]:
+                sen_scores[sen_index] += word_scores[word_index]
+                break
+
+# GENERATE SUMMARY
+
+# BUBBLE SORT: https://www.w3schools.com/python/python_dsa_bubblesort.asp
+n = len(sen_scores)
+for i in range(n-1):
+  for j in range(n-i-1):
+    if sen_scores[j] > sen_scores[j+1]:
+      sen_scores[j], sen_scores[j + 1] = sen_scores[j + 1], sen_scores[j]
+      sorted_sen[j], sorted_sen[j + 1] = sorted_sen[j + 1], sorted_sen[j]
+
+print(sen_scores)
+
+# SHOW HIGHEST RATED SENTENCES
+no_sen = 10
+
+for index in range(len(sorted_sen)-1, len(sorted_sen)- no_sen -1, -1):
+    print(sorted_sen[index])
 
 file.close()
