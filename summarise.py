@@ -1,18 +1,43 @@
 import nltk
+import requests
+from bs4 import BeautifulSoup as bs
+
+article = ""
+
+# REQUEST HTML
+while True:
+    url = input("Enter the URL of news article: ")
+
+    try:
+        request = requests.get(url)
+
+        if request.status_code == 200:
+
+            html = bs(request.text, "html.parser")
+            for p in html.find_all("p"):
+                article += p.text
+
+            break
+        else:
+            print("Couldn't connect to URL")
+    except:
+        print("Invalid URL")
+
+
+
 
 # OPEN ARTICLES
 # file = open("article_one.txt")
 
 # file = open("article_two.txt")
 
-file = open("article_three.txt")
+# file = open("article_three.txt")
 
-article = ""
 
 # REMOVE PHARAGRAPH SPACES
-for line in file:
-    if line != "\n":
-        article += line
+# for line in file:
+#     if line != "\n":
+#         article += line
 
 article_sen = nltk.sent_tokenize(article)
 
@@ -101,5 +126,6 @@ no_sen = 10
 
 for index in range(len(sorted_sen)-1, len(sorted_sen)- no_sen -1, -1):
     print(sorted_sen[index])
+    print("")
 
-file.close()
+# file.close()
