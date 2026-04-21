@@ -15,8 +15,13 @@ exp.get("/", async function(request, response) {
   if (url == undefined) {
     await response.sendFile(__dirname + "/start/index.html")
   } else { 
-    const data = await fetch(url)
-    text = await data.text()
+    try {
+      const data = await fetch(url)
+      text = await data.text()
+    } catch {
+      response.send("Invalid URL")
+    }
+    
 
     await response.sendFile(__dirname + "/webroot/index.html")
   }
