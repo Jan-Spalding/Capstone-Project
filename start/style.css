@@ -1,0 +1,40 @@
+body {
+    margin:0;
+    padding:0;
+    font-family:Arial, Helvetica;
+}
+
+#page {
+    height:100vh;
+    width:100vw;
+}
+
+#holder {
+    /* border:2px solid black; */
+    width:300px;
+    height:100px;
+    /* padding:10px; */
+}
+
+.center {
+    display:flex;
+    justify-content:center;
+    align-items:center;
+}
+
+.column {
+    display:flex;
+    justify-content: center;
+    align-items:center;
+    flex-direction:column
+}
+
+input {
+    width:90%;
+    height:30px;
+}
+
+button {
+    height:30px;
+    width:10%;
+}
