@@ -2,6 +2,7 @@ body {
   margin:0;
   padding:0;
   font-family:Arial, Helvetica;
+  overflow:hidden;
 }
 
 .center {
@@ -21,4 +22,17 @@ body {
   width:50vw;
   height:100vh;
   overflow-x:scroll;
+  border-right: 2px solid black;
+}
+
+#info { 
+  width:50vw;
+  height:100vh;
+  overflow-x:scroll;
+  padding:10px;
+}
+
+.listIndex {
+  margin-bottom:10px;
+  font-size:20px;
 }

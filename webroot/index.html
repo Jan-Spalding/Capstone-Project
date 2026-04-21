@@ -9,12 +9,21 @@
 </head>
 
 <body>
-  <div id="page">
-    <div id="webpage">
-
-    </div>
+  <div id="page" class="center">
+    <div id="webpage"></div>
     <div id="info">
-
+      <div class="center" style="justify-content: space-evenly;">
+        <h1>Summary:</h1>
+        <div class="column">
+          <p style="padding:0;margin:0;">Summary Points:</p>
+          <div class="center">
+            <input type="range" id="no_points" min="1" value="10">
+            <p id="pointText">10</p>
+          </div>
+        </div>
+        
+      </div>
+      
     </div>
   </div>
   <script src="/socket.io/socket.io.js"></script>
