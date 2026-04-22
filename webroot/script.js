@@ -1,13 +1,12 @@
 let socket = io()
 
-socket.on("HTMLdata", function(text) {
+socket.on("HTMLdata", function(text, source) {
   let parser = new DOMParser();
   let page = parser.parseFromString(text, "text/html")
   let html = page.body
   document.getElementById("webpage").appendChild(html)
   findArticle(html)
 })
-
 
 function findArticle(html) {
   html.style.cssText = "padding:0;margin:0;"
@@ -26,6 +25,18 @@ function findArticle(html) {
   for(let i = 0; i < pictures.length; i++) {
     pictures[i].style.cssText = "width:40vw;height:calc(50vw/2);"
   }
+
+  // console.log(source)
+
+  // switch(source) {
+  //   case "BBC-GTM":
+  //     console.log("this is working")
+  //     let aside = html.getElementsByTagName("aside")
+  //     for(let i = 0; i < aside.length; i++) {
+  //       aside[i].remove()
+  //     }
+  //     break;
+  // }
 
   let words = ""
 
@@ -110,6 +121,7 @@ function removeCharacters(sentence) {
 let uniqueWords = []
 let uniqueFrequency = []
 let highestFrequency = 0
+let totalWords = 0
 let wordScores = []
 let rawSentence
 
@@ -121,6 +133,7 @@ function wordFreq(words) {
       if (words[i] == uniqueWords[j]) {
         unique = false;
         uniqueFrequency[j] += 1
+        totalWords++
 
         if (uniqueFrequency[j] > highestFrequency) {
           highestFrequency = uniqueFrequency[j]
@@ -133,6 +146,7 @@ function wordFreq(words) {
     if (unique) {
       uniqueWords.push(words[i])
       uniqueFrequency.push(1)
+      totalWords++
     }
     
   }
@@ -202,6 +216,7 @@ function summarise(text) {
 
 
   displayResults(rawSentence)
+  socket.emit("analysis", uniqueWords, uniqueFrequency)
 }
 
 let ul
@@ -226,4 +241,32 @@ document.getElementById("no_points").addEventListener("change", function(event) 
 
   ul.remove()
   displayResults(rawSentence)
+})
+
+backPage = document.getElementsByClassName("backPage")
+for(let i = 0; i < backPage.length; i++) {
+  backPage[i].addEventListener("click", function() {
+    url = window.location.href
+    newUrl = url.slice(27)
+
+    window.location.href = newUrl
+  })
+}
+
+
+socket.on("score", function(score, totalMarkedWords) {
+  sedimentalScore = (score/totalMarkedWords) / 5
+
+  if (sedimentalScore > 0) {
+    document.getElementById("sed_positive").style.width = sedimentalScore * 100 + "%"
+  } else {
+    document.getElementById("sed_negative").style.width = sedimentalScore * -100 + "%"
+  }
+
+  densityScore = totalMarkedWords / totalWords
+  if (densityScore > 0) {
+    document.getElementById("den_positive").style.width = densityScore * 100 + "%"
+  } else {
+    document.getElementById("den_negative").style.width = densityScore * -100 + "%"
+  }
 })

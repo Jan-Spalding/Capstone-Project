@@ -22,7 +22,18 @@ body {
   width:50vw;
   height:100vh;
   overflow-x:scroll;
-  border-right: 2px solid black;
+  border-right: 4px solid black;
+  padding:20px;
+}
+
+#backButton {
+  border:2px solid black;
+  border-radius:8px;
+  padding:10px;
+}
+
+.backPage:hover {
+  cursor: pointer;
 }
 
 #info { 
@@ -35,4 +46,32 @@ body {
 .listIndex {
   margin-bottom:10px;
   font-size:20px;
+}
+
+.bar {
+  position:relative;
+  width:200px;
+  height:30px;
+  background-color:rgba(0,0,0,0.5);
+  border:1px solid black;
+}
+
+.bar p {
+  position:absolute;
+  color:white;
+}
+
+.positive {
+  height:30px;
+  width:0%;
+  border-left:1px solid black;
+  background-color:green;
+}
+
+.negative {
+  float: right;
+  height:30px;
+  width:0%;
+  border-right: 1px solid black;
+  background-color:red;
 }
