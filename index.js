@@ -19,7 +19,8 @@ exp.get("/", async function(request, response) {
   } else { 
     try {
       const data = await fetch(url)
-      // server = await data.hearders.get("server")
+      server = data.headers.get("server")
+      console.log(data)
       text = await data.text()
     } catch {
       response.send("Invalid URL")

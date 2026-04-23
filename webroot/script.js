@@ -5,10 +5,12 @@ socket.on("HTMLdata", function(text, source) {
   let page = parser.parseFromString(text, "text/html")
   let html = page.body
   document.getElementById("webpage").appendChild(html)
-  findArticle(html)
+  findArticle(html, source)
 })
 
-function findArticle(html) {
+let pElements = []
+
+function findArticle(html, source) {
   html.style.cssText = "padding:0;margin:0;"
 
   let headers = html.getElementsByTagName("header")
@@ -26,22 +28,29 @@ function findArticle(html) {
     pictures[i].style.cssText = "width:40vw;height:calc(50vw/2);"
   }
 
-  // console.log(source)
+  console.log(source)
 
-  // switch(source) {
-  //   case "BBC-GTM":
-  //     console.log("this is working")
-  //     let aside = html.getElementsByTagName("aside")
-  //     for(let i = 0; i < aside.length; i++) {
-  //       aside[i].remove()
-  //     }
-  //     break;
-  // }
+  switch(source) {
+    case "BBC-GTM":
+      let aside = html.getElementsByTagName("aside")
+      for(let i = aside.length-1; i >= 0; i--) {
+        aside[i].remove()
+      }
+
+      let links = html.getElementsByTagName("a")
+      for (let i = 0; i < links.length; i++) {
+        let a = links[i].href
+        a = a.slice(21)
+        links[i].href = "http://localhost:3000/?url=https://www.bbc.co.uk" + a 
+      }
+      break;
+  }
 
   let words = ""
 
   let text = html.getElementsByTagName("p")
   for(let i = 0; i < text.length; i++) {
+    pElements.push(text[i])
     words += text[i].textContent + "."
   }
 
@@ -91,8 +100,6 @@ function removeCharacters(sentence) {
   for(let i = sentence.length-1; i >= 0; i--) {
     sentence[i] = sentence[i].toLowerCase()
 
-    
-
     for(let j = sentence[i].length-1; j >= 0; j--) {
       asciiValue = sentence[i].charCodeAt(j)
 
@@ -118,12 +125,21 @@ function removeCharacters(sentence) {
   return sentence;
 }
 
+function cleanSentence(sentence) {
+  for(let i = sentence.length-1; i >= 0; i--) {
+    if (sentence[i].length <= 5) {
+      sentence.splice(i, 1)
+    }
+  }
+}
+
 let uniqueWords = []
 let uniqueFrequency = []
 let highestFrequency = 0
 let totalWords = 0
 let wordScores = []
 let rawSentence
+let sentences
 
 function wordFreq(words) {
   for(let i = 0; i < words.length; i++) {
@@ -148,7 +164,6 @@ function wordFreq(words) {
       uniqueFrequency.push(1)
       totalWords++
     }
-    
   }
 
   for (let i = 0; i < uniqueFrequency.length; i++) {
@@ -163,8 +178,9 @@ function wordFreq(words) {
 
 function summarise(text) {
   sentences = sentenceToken(text)
+  cleanSentence(sentences)
   console.log(sentences)
-  stripped = [...sentence]
+  stripped = [...sentences]
   rawSentence = removeCharacters(stripped)
 
   document.getElementById("no_points").max = rawSentence.length
@@ -203,24 +219,23 @@ function summarise(text) {
         sentenceScores[j] = sentenceScores[j + 1]
         sentenceScores[j + 1] = temp
 
-        temp = rawSentence[j]
-        rawSentence[j] = rawSentence[j + 1]
-        rawSentence[j + 1] = temp
+        temp = sentences[j]
+        sentences[j] = sentences[j + 1]
+        sentences[j + 1] = temp
 
+        temp = pElements[j]
+        pElements[j] = pElements[j + 1]
+        pElements[j + 1] = temp
       }
     }
   }
 
-  // console.log(sentenceScores)
-  // console.log(rawSentence)
-
-
-  displayResults(rawSentence)
+  displayResults(sentences)
   socket.emit("analysis", uniqueWords, uniqueFrequency)
 }
 
 let ul
-
+let points = 10
 function displayResults(sentence) {
   ul = document.createElement("ul")
 
@@ -228,19 +243,23 @@ function displayResults(sentence) {
     let li = document.createElement("li")
     li.innerHTML = sentence[sentence.length-1 - i]
     li.classList = "listIndex"
+
+    li.addEventListener("click", function() {
+      pElements[sentence.length-1 - i].scrollIntoView({behavior: "smooth", block: "center"})
+    })
+
     ul.appendChild(li)
   }
 
   document.getElementById("info").appendChild(ul)
 }
 
-let points = 10
 document.getElementById("no_points").addEventListener("change", function(event) {
   points = event.target.value
   document.getElementById("pointText").innerHTML = event.target.value
 
   ul.remove()
-  displayResults(rawSentence)
+  displayResults(sentences)
 })
 
 backPage = document.getElementsByClassName("backPage")
@@ -253,6 +272,38 @@ for(let i = 0; i < backPage.length; i++) {
   })
 }
 
+helpText = [
+  "Sentiment Value shows the overall tone of the article.",
+  "Emotional Density shows how many sentiment points are in the article.",
+  "Change the slider to adjust how many summary points there are.",
+  "Click on a summary point to view it in the article."
+]
+
+help = document.getElementsByClassName("help")
+for(let i = 0; i < help.length; i++) {
+
+  let container = document.createElement("div")
+  container.className = "helpContainer center"
+
+  let p = document.createElement("p")
+
+  help[i].addEventListener("mouseenter", function(event) {
+    p.innerHTML = helpText[i]
+
+    offset = event.target.getBoundingClientRect()
+    container.style.top = offset.top + "px"
+    container.style.left = offset.left - 170 + "px"
+
+    container.appendChild(p)
+    document.body.appendChild(container)
+  })
+
+  help[i].addEventListener("mouseleave", function(event) {
+    container.remove()
+  })
+}
+
+console.log(pElements)
 
 socket.on("score", function(score, totalMarkedWords) {
   sedimentalScore = (score/totalMarkedWords) / 5
