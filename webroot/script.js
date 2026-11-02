@@ -179,7 +179,7 @@ function wordFreq(words) {
 function summarise(text) {
   sentences = sentenceToken(text)
   cleanSentence(sentences)
-  console.log(sentences)
+
   stripped = [...sentences]
   rawSentence = removeCharacters(stripped)
 
@@ -252,6 +252,9 @@ function displayResults(sentence) {
   }
 
   document.getElementById("info").appendChild(ul)
+
+  let time = Date.now() - startTime
+  console.log("Processing Time: " + time + "ms")
 }
 
 document.getElementById("no_points").addEventListener("change", function(event) {
@@ -314,10 +317,15 @@ socket.on("score", function(score, totalMarkedWords) {
     document.getElementById("sed_negative").style.width = sedimentalScore * -100 + "%"
   }
 
+  document.getElementById("sed_title").innerHTML = Math.floor(sedimentalScore * 100) + "%"
+
   densityScore = totalMarkedWords / totalWords
-  if (densityScore > 0) {
-    document.getElementById("den_positive").style.width = densityScore * 100 + "%"
-  } else {
-    document.getElementById("den_negative").style.width = densityScore * -100 + "%"
-  }
+  document.getElementById("den_score").style.width = densityScore * 100 + "%"
+  document.getElementById("den_title").innerHTML = Math.floor(densityScore * 100) + "%"
 })
+
+let startTime
+
+window.onload = function() {
+  startTime = Date.now()
+}

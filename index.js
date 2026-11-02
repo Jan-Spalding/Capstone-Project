@@ -1,6 +1,9 @@
 const socketio = require("socket.io")
 const express = require("express")
 const fs = require("node:fs")
+const process = require("process")
+
+process.chdir(__dirname)
 
 let exp = express();
 
@@ -39,7 +42,6 @@ fs.readFile("./AFINN-111.txt", "utf8", function(error, data) {
     console.log("File failed to load")
   }
 
-  // console.log(data)
   start = 0
   for(let i = 0; i < data.length; i++) {
 
@@ -55,11 +57,7 @@ fs.readFile("./AFINN-111.txt", "utf8", function(error, data) {
 
       start = index+1
     }
-
   }
-
-  // console.log(words)
-  // console.log(score)
 })
 
 let webapp = exp.listen(3000, "localhost", function() {
@@ -79,7 +77,6 @@ io.on("connection", function(socket) {
     for(let i = 0; i < unique.length; i++) {
       for(let j = 0; j < words.length; j++) {
         if (unique[i] == words[j]) {
-          // console.log("word: " + words[j] + " | " + frequency[i])
           overallScore += frequency[i] * score[j]
           totalMarkedWords += frequency[i]
           break;
